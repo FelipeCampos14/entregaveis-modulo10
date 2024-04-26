@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conteúdo Secreto</title>
+</head>
+<body>
+    <h1>Conteúdo Secreto</h1>
+    <img src="https://picsum.photos/300" width="300" height="300"/>
+    <button onClick="window.location.reload();">Refresh Page</button>
+    <h1>Update user</h1>
+    <form action="http://localhost:5000/user-update" method="POST">
+        <label for="old_username">Old Username</label>
+        <input type="text" name="old_username" id="old_username" required>
+        <label for="old_password">Old Password</label>
+        <input type="password" name="old_password" id="old_password" required>
+        <br>
+        <label for="new_username">New Username</label>
+        <input type="text" name="new_username" id="new_username" required>
+        <label for="new_password">New Password</label>
+        <input type="password" name="new_password" id="new_password" required>
+        <br>
+        <input type="submit" value="Update">
+    </form>
+    <br>
+    <form action="http://localhost:5000/user-delete" method="POST">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" required>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" required>
+        <br>
+        <input type="submit" value="Delete">
+    </form>
+</body>
+</html>
