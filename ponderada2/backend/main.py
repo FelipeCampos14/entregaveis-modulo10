@@ -1,12 +1,9 @@
-from fastapi import FastAPI, Cookie, HTTPException, Response, Depends, Request
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from fastapi import FastAPI, Cookie, HTTPException, Depends, Request
+from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
 from database.models import UserDB
-from database.database import SessionLocal
-app = FastAPI()
+from database.database import SessionLocal, Base, engine
 
 class User(BaseModel):
     id: int
@@ -21,17 +18,19 @@ def get_db():
     finally:
         db.close()
 
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI()
+
 # CRUD Operations
 @app.get("/users", response_model=List[User])
 def get_users(db: Session = Depends(get_db)):
-    db = SessionLocal()
     users = db.query(UserDB).all()
     db.close()
     return users
 
 @app.get("/users/{user_id}", response_model=User)
 def get_user(user_id: int, db: Session = Depends(get_db)):
-    db = SessionLocal()
     user = db.query(UserDB).filter(UserDB.id == user_id).first()
     db.close()
     if user is None:
@@ -44,7 +43,6 @@ class UserCreate(BaseModel):
 
 @app.post("/users", response_model=User)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db = SessionLocal()
     db_user = UserDB(username=user.username, password=user.password)
     db.add(db_user)
     db.commit()
@@ -58,7 +56,6 @@ class UserUpdate(BaseModel):
 
 @app.put("/users/{user_id}", response_model=User)
 def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
-    db = SessionLocal()
     db_user = db.query(UserDB).filter(UserDB.id == user_id).first()
     if db_user is None:
         db.close()
@@ -73,8 +70,7 @@ def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
     return db_user
 
 @app.delete("/users/{user_id}", response_model=User)
-def delete_user(user_id: int):
-    db = SessionLocal()
+def delete_user(user_id: int, db: Session = Depends(get_db)):
     db_user = db.query(UserDB).filter(UserDB.id == user_id).first()
     if db_user is None:
         db.close()
@@ -91,7 +87,6 @@ security = HTTPBasic()
 
 @app.post("/token")
 def create_token(credentials: HTTPBasicCredentials = Depends(security), db: Session = Depends(get_db)):
-    db = SessionLocal()
     user = db.query(UserDB).filter(UserDB.username == credentials.username, UserDB.password == credentials.password).first()
     db.close()
     if user is None:
@@ -99,8 +94,7 @@ def create_token(credentials: HTTPBasicCredentials = Depends(security), db: Sess
     return {"access_token": str(user.id), "token_type": "bearer"}
 
 @app.get("/users/me")
-def read_users_me(token: str = Cookie(None)):
-    db = SessionLocal()
+def read_users_me(token: str = Cookie(None), db: Session = Depends(get_db)):
     user = db.query(UserDB).filter(UserDB.id == int(token)).first()
     db.close()
     if user is None:

@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<List<User>> fetchUsers() async {
-    final response = await http.get(Uri.parse('http://localhost:8000/users'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:8000/users'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       return data.map((e) => User.fromJson(e)).toList();
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> createUser() async {
     final response = await http.post(
-      Uri.parse('http://localhost:8000/users'),
+      Uri.parse('http://10.0.2.2:8000/users'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> deleteUser(int id) async {
     final response = await http.delete(
-      Uri.parse('http://localhost:8000/users/$id'),
+      Uri.parse('http://10.0.2.2:8000/users/$id'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
