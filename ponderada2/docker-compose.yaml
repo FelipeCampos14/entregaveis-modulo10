@@ -14,15 +14,6 @@ services:
     networks:
       - app-network
 
-  frontend:
-    build:
-      context: ./frontend_mobile
-      dockerfile: Dockerfile
-    ports:
-      - "8080:80"
-    networks:
-      - app-network
-
   database:
     image: postgres:13
     environment:
