@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  _showEditDialog(int id, String title, String status) async {
+  Future<void> editPopUp(int id, String title, String status) async {
     _titleControllerUpdate.text = title;
     _statusControllerUpdate.text = status;
     await showDialog<String>(
@@ -208,7 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               IconButton(
                                 icon: Icon(Icons.edit),
                                 onPressed: () {
-                                  _showEditDialog(
+                                  editPopUp(
                                       snapshot.data![index].id,
                                       snapshot.data![index].title,
                                       snapshot.data![index].status);
