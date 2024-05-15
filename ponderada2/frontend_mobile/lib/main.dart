@@ -6,18 +6,18 @@ void main() {
   runApp(MyApp());
 }
 
-class User {
+class Todo {
   final int id;
-  final String username;
-  final String password;
+  final String title;
+  final String status;
 
-  User({required this.id, required this.username, required this.password});
+  Todo({required this.id, required this.title, required this.status});
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory Todo.fromJson(Map<String, dynamic> json) {
+    return Todo(
       id: json['id'],
-      username: json['username'],
-      password: json['password'],
+      title: json['title'],
+      status: json['status'],
     );
   }
 }
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'User Management App',
+      title: 'Todo Management App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -41,50 +41,52 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late Future<List<User>> _futureUsers;
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  late Future<List<Todo>> _futureTodos;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _statusController = TextEditingController();
+  final TextEditingController _titleControllerUpdate = TextEditingController();
+  final TextEditingController _statusControllerUpdate = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _futureUsers = fetchUsers();
+    _futureTodos = fetchTodos();
   }
 
-  Future<List<User>> fetchUsers() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:8000/users'));
+  Future<List<Todo>> fetchTodos() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:8000/todos'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      return data.map((e) => User.fromJson(e)).toList();
+      return data.map((e) => Todo.fromJson(e)).toList();
     } else {
-      throw Exception('Failed to load users');
+      throw Exception('Failed to load Todos');
     }
   }
 
-  Future<void> createUser() async {
+  Future<void> createTodo() async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/users'),
+      Uri.parse('http://10.0.2.2:8000/todos'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'username': _usernameController.text,
-        'password': _passwordController.text,
+        'title': _titleController.text,
+        'status': _statusController.text,
       }),
     );
 
     if (response.statusCode == 200) {
       setState(() {
-        _futureUsers = fetchUsers();
+        _futureTodos = fetchTodos();
       });
     } else {
-      throw Exception('Failed to create user');
+      throw Exception('Failed to create Todo');
     }
   }
 
-  Future<void> deleteUser(int id) async {
+  Future<void> deleteTodo(int id) async {
     final response = await http.delete(
-      Uri.parse('http://10.0.2.2:8000/users/$id'),
+      Uri.parse('http://10.0.2.2:8000/todos/$id'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -92,18 +94,79 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (response.statusCode == 200) {
       setState(() {
-        _futureUsers = fetchUsers();
+        _futureTodos = fetchTodos();
       });
     } else {
-      throw Exception('Failed to delete user');
+      throw Exception('Failed to delete Todo');
     }
+  }
+
+  Future<void> updateTodo(int id, String title, String status) async {
+    final response = await http.put(
+      Uri.parse('http://10.0.2.2:8000/todos/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'title': title,
+        'status': status,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        _futureTodos = fetchTodos();
+      });
+    } else {
+      throw Exception('Failed to update Todo');
+    }
+  }
+
+  _showEditDialog(int id, String title, String status) async {
+    _titleControllerUpdate.text = title;
+    _statusControllerUpdate.text = status;
+    await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: _titleControllerUpdate,
+                decoration: InputDecoration(labelText: 'Title'),
+              ),
+              TextField(
+                controller: _statusControllerUpdate,
+                decoration: InputDecoration(labelText: 'Status'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                updateTodo(id, _titleControllerUpdate.text, _statusControllerUpdate.text);
+                Navigator.pop(context);
+              },
+              child: Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Users'),
+        title: Text('Todos'),
       ),
       body: Center(
         child: Column(
@@ -111,39 +174,53 @@ class _MyHomePageState extends State<MyHomePage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(labelText: 'Username'),
+                controller: _titleController,
+                decoration: InputDecoration(labelText: 'title'),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                controller: _statusController,
+                decoration: InputDecoration(labelText: 'status'),
               ),
             ),
             ElevatedButton(
               onPressed: () {
-                createUser();
+                createTodo();
               },
-              child: Text('Create User'),
+              child: Text('Create Todo'),
             ),
             Expanded(
-              child: FutureBuilder<List<User>>(
-                future: _futureUsers,
+              child: FutureBuilder<List<Todo>>(
+                future: _futureTodos,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(snapshot.data![index].username),
-                          subtitle: Text(snapshot.data![index].password),
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              deleteUser(snapshot.data![index].id);
-                            },
+                          title: Text(snapshot.data![index].title),
+                          subtitle: Text(snapshot.data![index].status),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () {
+                                  _showEditDialog(
+                                      snapshot.data![index].id,
+                                      snapshot.data![index].title,
+                                      snapshot.data![index].status);
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () {
+                                  deleteTodo(snapshot.data![index].id);
+                                },
+                              ),
+                            ],
                           ),
                         );
                       },
