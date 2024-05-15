@@ -1,4 +1,9 @@
+
+
+
 # Ponderada 2
+
+https://github.com/FelipeCampos14/entregaveis-modulo10/assets/99193547/f2b0e464-7e7b-4648-8075-f654cc7a9f3b
 
 ## Vídeo
 
