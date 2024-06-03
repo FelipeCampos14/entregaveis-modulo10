@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 metadata_obj = MetaData()
 
 # Database Configuration
-SQLALCHEMY_DATABASE_URL = "sqlite:///ponderada2.db"
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password@database:5432/fastapi_db"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 

@@ -4,3 +4,4 @@ psycopg2-binary==2.9.6
 sqlalchemy==1.4.46
 passlib
 python-jose 
+psycopg2-binary
