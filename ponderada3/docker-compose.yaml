@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   backend:
@@ -9,8 +9,9 @@ services:
       - "8000:8000"
     depends_on:
       - database
+      - image-processing
     environment:
-      - DATABASE_URL=postgresql://postgres:password@database:5432/fastapi_db
+      - DATABASE_URL=postgresql://postgres:postgres@database:5432/fastapi_db
     networks:
       - app-network
 
@@ -18,14 +19,22 @@ services:
     image: postgres:13
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: fastapi_db
     ports:
-      - "5432:5432" 
+      - "5433:5433" 
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+
+  image-processing:
+    build: 
+      context: ./image_processor
+      dockerfile: Dockerfile_image
+    container_name: image_processing
+    ports:
+      - "8001:8000"
 
 volumes:
   postgres_data:
