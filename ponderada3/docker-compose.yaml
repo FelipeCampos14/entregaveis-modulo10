@@ -29,12 +29,11 @@ services:
       - app-network
 
   image-processing:
-    build: 
-      context: ./image_processor
-      dockerfile: Dockerfile_image
+    build: ./image_processor
     container_name: image_processing
     ports:
-      - "8001:8000"
+      - "8001:8001"
+
 
 volumes:
   postgres_data:
