@@ -8,7 +8,6 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:frontend_mobile/loginPage.dart';
 
-
 void main() {
   runApp(MyApp());
 }
