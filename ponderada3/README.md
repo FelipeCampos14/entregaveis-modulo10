@@ -1,11 +1,9 @@
-
-
-
 # Ponderada 3
 
 
 ## Vídeo
 
+[Screencast from 06-06-2024 08:30:45.webm](https://github.com/FelipeCampos14/entregaveis-modulo10/assets/99193547/63843b64-fa0e-4814-b610-bdacb9c51f14)
 
 ## Explicação
 
