@@ -1,0 +1,5 @@
+{"time": "2024-06-17 11:19:27,424", "name": "main", "level": "INFO", "message": "Acessando a rota /"}
+{"time": "2024-06-17 11:19:37,143", "name": "main", "level": "INFO", "message": "Acessando a rota /"}
+{"time": "2024-06-17 11:19:38,084", "name": "main", "level": "INFO", "message": "Acessando a rota /"}
+{"time": "2024-06-17 11:19:45,667", "name": "main", "level": "INFO", "message": "{'message': 'Acessando a rota /usuarios', 'method': 'GET'}"}
+{"time": "2024-06-17 11:19:46,941", "name": "main", "level": "INFO", "message": "{'message': 'Acessando a rota /usuarios', 'method': 'GET'}"}

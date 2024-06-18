@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf  # Mount the NGINX config
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@database:5432/fastapi_db
+    networks:
+      - app-network
+    volumes:
+      - ./logs-volumes:/app/logs
+
+  database:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fastapi_db
+    ports:
+      - "5433:5433" 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

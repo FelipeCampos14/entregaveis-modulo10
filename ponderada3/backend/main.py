@@ -5,10 +5,14 @@ from typing import List
 from database.database import SessionLocal, Base, engine
 from database.models import UserDB
 from database.schemas import User, UserCreate
+from logging_config import LoggerSetup
+import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Cria um logger raiz
+logger_setup = LoggerSetup()
+
+# Adiciona o logger para o módulo
+LOGGER = logging.getLogger(__name__)
 
 # Dependency to get a database session
 def get_db():
@@ -25,11 +29,13 @@ app = FastAPI()
 # Home (irei usar como um heartbeat)
 @app.get("/")
 def get_heartbeat():
+    LOGGER.info("Acessando a rota /")
     return {"message": "Hello world"}
 
 # CRUD Operations
 @app.get("/users", response_model=List[User])
 def get_users(db: Session = Depends(get_db)):
+    LOGGER.info({"message": "Acessando a rota /usuarios", "method": "GET"})
     users = db.query(UserDB).all()
     db.close()
     return users
@@ -39,9 +45,9 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(UserDB).filter(UserDB.id == user_id).first()
     db.close()
     if user is None:
-        logger.warning(f" Usuário com id {user_id} não foi encontrado.")
+        # logger.warning(f" Usuário com id {user_id} não foi encontrado.")
         raise HTTPException(status_code=404, detail="User not found")
-    logger.info(f" Usuário com id {user_id} foi encontrado.")
+    # logger.info(f" Usuário com id {user_id} foi encontrado.")
     return user
 
 @app.post("/users", response_model=User)
@@ -51,12 +57,12 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     db.close()
-    logger.info(f" Usuário com id {db_user.id} foi criado.")
+    # logger.info(f" Usuário com id {db_user.id} foi criado.")
     return db_user
 
 @app.post("/token")
 def create_token(user: UserCreate, db: Session = Depends(get_db)):
-    logger.info(f"User {user}")
+    # logger.info(f"User {user}")
     user = db.query(UserDB).filter(UserDB.username == user.username, UserDB.password == user.password).first()
     db.close()
     if user is None:

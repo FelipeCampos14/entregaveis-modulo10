@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   String _message = '';
 
-  Future<void> _login() async {
+  Future<void> _login() async { 
     final response = await http.post(
       Uri.parse('http://172.18.0.1:8000/token'),
       headers: <String, String>{
@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } else {
       setState(() {
-        _message = 'Login failed: ${response.body}, ${response.statusCode}, ${_usernameController.text}, ${_passwordController.text}';
+        _message = 'Login failed!';
       });
     }
   }
